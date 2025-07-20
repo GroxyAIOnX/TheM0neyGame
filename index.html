@@ -1,0 +1,1080 @@
+<!-- DONT YOU DARE CHANGE THE CODE -->
+<!-- Just deploy to Vercel. Don't change the code if you don't know what you are doing or you will break the code! -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretend Company Tycoon</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top to allow scrolling */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Darker overlay */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 550px; /* Increased max-width for terms */
+            width: 90%;
+            position: relative;
+            animation: fadeInScale 0.3s ease-out forwards;
+            /* New styles for fitting the modal */
+            max-height: 90vh; /* Limit modal height to 90% of viewport height */
+            overflow-y: auto; /* Enable scrolling within the modal if content overflows */
+        }
+        .close-button {
+            color: #9ca3af;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #4b5563;
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        /* Custom styles for SVG logos */
+        .logo-svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5; /* Default background for SVG containers */
+        }
+        .logo-svg-container.nike {
+            background-color: #000000; /* Black background for Nike */
+        }
+        .logo-svg-container.microsoft {
+            background-color: #FFFFFF; /* Changed to white for better contrast */
+        }
+        /* Styling for the logo within the modal */
+        .modal-logo-container {
+            width: 80px; /* Fixed width for modal logo */
+            height: 80px; /* Fixed height for modal logo */
+            margin: 0 auto 20px auto; /* Center and add margin below */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex; /* Ensure flex properties apply to center content */
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5; /* Default background for modal logo container */
+        }
+        .modal-logo-container.nike-modal {
+            background-color: #000000;
+        }
+        .modal-logo-container.microsoft-modal {
+            background-color: #FFFFFF;
+        }
+        .modal-logo-container img,
+        .modal-logo-container svg {
+            max-width: 90%; /* Ensure logo fits within container */
+            max-height: 90%;
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-6xl flex flex-col items-center">
+        <h1 class="text-5xl font-extrabold text-gray-900 mb-4 text-center">
+            Pretend Company Tycoon
+        </h1>
+        <p class="text-lg text-gray-600 mb-8 text-center max-w-2xl">
+            Welcome, aspiring entrepreneur! Use your fake money to buy and collect companies. Remember, this is just for fun – no real money involved!
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between w-full mb-8 p-4 bg-indigo-50 rounded-xl shadow-inner">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <span class="text-3xl font-bold text-indigo-700 mr-3">💰</span>
+                <span class="text-3xl font-bold text-gray-800">Your Fake Money: $<span id="userMoneyDisplay">10000</span></span>
+            </div>
+            <div class="flex items-center mb-4 sm:mb-0 ml-4">
+                <span class="text-3xl font-bold text-blue-700 mr-3">📈</span>
+                <span class="text-3xl font-bold text-gray-800">Credit Score: <span id="creditScoreDisplay">700</span></span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="loanButton" class="py-3 px-6 bg-blue-500 text-white rounded-full text-lg font-semibold shadow-md hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-colors duration-200">
+                    Take Loan
+                </button>
+                <button id="nextDayButton" class="py-3 px-6 bg-purple-500 text-white rounded-full text-lg font-semibold shadow-md hover:bg-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300 transition-colors duration-200">
+                    Next Day (<span id="currentDayDisplay">1</span>)
+                </button>
+                <button id="resetGameButton" class="py-3 px-6 bg-red-500 text-white rounded-full text-lg font-semibold shadow-md hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 transition-colors duration-200">
+                    Reset Game
+                </button>
+            </div>
+        </div>
+
+        <!-- Worker Management Section -->
+        <div class="flex flex-col sm:flex-row items-center justify-between w-full mb-8 p-4 bg-green-50 rounded-xl shadow-inner">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <span class="text-3xl font-bold text-green-700 mr-3">👷</span>
+                <span class="text-3xl font-bold text-gray-800">Workers: <span id="totalWorkersDisplay">0</span></span>
+            </div>
+            <div class="flex items-center mb-4 sm:mb-0 ml-4">
+                <span class="text-3xl font-bold text-green-700 mr-3">💵</span>
+                <span class="text-3xl font-bold text-gray-800">Salary/Worker: $<span id="workerSalaryDisplay">10</span></span>
+            </div>
+            <div class="flex gap-2">
+                <button id="decreaseSalaryButton" class="py-2 px-4 bg-red-400 text-white rounded-full text-md font-semibold shadow-md hover:bg-red-500 transition-colors duration-200">
+                    - Salary
+                </button>
+                <button id="increaseSalaryButton" class="py-2 px-4 bg-green-400 text-white rounded-full text-md font-semibold shadow-md hover:bg-green-500 transition-colors duration-200">
+                    + Salary
+                </button>
+            </div>
+        </div>
+
+        <!-- Savings Account Section -->
+        <div class="flex flex-col sm:flex-row items-center justify-between w-full mb-8 p-4 bg-blue-50 rounded-xl shadow-inner">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <span class="text-3xl font-bold text-blue-700 mr-3">🏦</span>
+                <span class="text-3xl font-bold text-gray-800">Savings: $<span id="savingsAccountDisplay">0</span></span>
+            </div>
+            <div class="flex gap-2">
+                <button id="depositButton" class="py-2 px-4 bg-indigo-500 text-white rounded-full text-md font-semibold shadow-md hover:bg-indigo-600 transition-colors duration-200">
+                    Deposit
+                </button>
+                <button id="withdrawButton" class="py-2 px-4 bg-purple-500 text-white rounded-full text-md font-semibold shadow-md hover:bg-purple-600 transition-colors duration-200">
+                    Withdraw
+                </button>
+            </div>
+        </div>
+
+        <!-- Loan Status Display -->
+        <div id="loanStatusDisplay" class="w-full bg-yellow-100 border border-yellow-300 rounded-xl p-4 mb-8 text-center text-yellow-800 font-semibold text-lg hidden">
+            Current Loan: $<span id="loanAmountDisplay">0</span> | Interest Rate: <span id="loanInterestRateDisplay">0%</span> | Due in <span id="loanDaysRemaining">0</span> days
+        </div>
+
+
+        <div id="companyCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <!-- Company cards will be dynamically inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Custom Modal for Game Messages and Terms -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+
+            <!-- Terms of Service Content (Initially shown for purchase flow) -->
+            <div id="termsAndAgreementContent" class="text-left hidden">
+                <div id="modalCompanyLogo" class="modal-logo-container">
+                    <!-- Company logo will be inserted here -->
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Terms of Service for <span id="companyNameInTerms"></span></h3>
+                <div class="max-h-60 overflow-y-auto text-sm text-gray-700 pr-4 mb-6 border-b pb-4">
+                    <p class="mb-2">Welcome to our simulated company acquisition platform! By proceeding with this purchase, you agree to these pretend Terms of Service. This is a demo, and no real transactions, data, or services are involved. Your interaction here is purely for demonstration purposes.</p>
+                    <p class="mb-2"><strong>1. Fictional Transactions:</strong> All purchases and sales of companies within this application are entirely fictional. No real money is exchanged, and no actual ownership or legal rights are transferred.</p>
+                    <p class="mb-2"><strong>2. No Real Money Involved:</strong> Any currency displayed or exchanged within this application is purely for game simulation and has no real-world value. Do not attempt to use real money or expect real services.</p>
+                    <p class="mb-2"><strong>3. Data Privacy:</strong> No personal data is collected, stored, or transmitted by this application. Your activity within this demo is not recorded or tracked.</p>
+                    <p class="mb-2"><strong>4. Game Availability:</strong> This demo game is provided "as is" without any guarantees of uptime or functionality. It may be updated, removed, or changed at any time.</p>
+                    <p class="mb-2"><strong>5. Age Requirement:</strong> By using this demo, you confirm that you are of an age where you can understand and agree to these terms, or have parental/guardian consent.</p>
+                    <p class="mb-2"><strong>6. Limitation of Liability:</strong> We are not liable for any damages or issues arising from the use or inability to use this demonstration application.</p>
+                    <p class="mb-2"><strong>7. Company Management:</strong> You are solely responsible for the simulated management and strategic decisions related to any companies you acquire within this game.</p>
+                    <p class="mb-2"><strong>8. Simulated Deductions:</strong> Whenever you buy something for a company within this game, your simulated balance will be deducted accordingly.</p>
+                    <p class="mb-2"><strong>9. Loan Responsibility:</strong> Taking a loan will increase your available funds, but you are responsible for its repayment, including any accumulated interest. Failure to repay by the due date will result in a higher interest rate.</p>
+                    <p class="mb-2"><strong>10. Credit Score Impact:</strong> Your credit score will reflect your loan repayment behavior. Failing to repay a loan on time will negatively impact your credit score.</p>
+                    <p class="mb-2"><strong>11. Loan Eligibility:</strong> The bank may deny new loan applications if your credit score is below a certain threshold, indicating a lack of trust due to past repayment behavior.</p>
+                    <p class="mb-2"><strong>12. Bankruptcy Clause:</strong> Failure to maintain a sufficient credit score (reaching 0) or manage your workforce will result in a simulated bankruptcy, leading to the loss of all acquired companies and a reset of your financial standing.</p>
+                    <p class="mb-2"><strong>13. Passive Income:</strong> Owned companies will generate continuous income, with larger or more valuable companies providing a higher income rate per second.</p>
+                    <p class="mb-2"><strong>14. Worker Management:</strong> You are responsible for paying your workers a fair simulated salary. If salaries are too low, workers may leave your companies, potentially leading to operational failure and bankruptcy.</p>
+                    <p class="mb-2"><strong>15. Savings Account:</strong> You can deposit money into a savings account for safekeeping. In the event of a simulated bankruptcy, funds in your savings account may be used to help you recover, but your credit score will still reflect past financial difficulties.</p>
+                    <p>Thank you for playing our game!</p>
+                </div>
+                <div class="flex items-center justify-center mb-6">
+                    <input type="checkbox" id="agreeCheckbox" class="form-checkbox h-5 w-5 text-indigo-600 rounded-md">
+                    <label for="agreeCheckbox" class="ml-2 text-gray-700 text-base">I agree to the <a href="#" class="text-indigo-600 hover:underline font-medium">Terms of Service</a></label>
+                </div>
+                <button id="agreeAndPurchaseButton" class="w-full py-3 px-8 rounded-full bg-indigo-600 text-white text-lg font-semibold shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-colors duration-200 opacity-50 cursor-not-allowed" disabled>
+                    Agree & Purchase
+                </button>
+            </div>
+
+            <!-- Loan Offer Content -->
+            <div id="loanOfferContent" class="text-left hidden">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Loan Offer</h3>
+                <p class="text-lg text-gray-700 mb-4 text-center">Need some extra funds to expand your empire?</p>
+                <ul class="text-gray-700 text-left w-full space-y-2 mb-6 px-4">
+                    <li class="flex items-center"><span class="font-semibold mr-2">Amount:</span> $<span id="offerLoanAmount">5000</span></li>
+                    <li class="flex items-center"><span class="font-semibold mr-2">Initial Interest Rate:</span> <span id="offerInterestRate">5%</span></li>
+                    <li class="flex items-center"><span class="font-semibold mr-2">Repayment Term:</span> <span id="offerLoanTerm">5</span> days</li>
+                </ul>
+                <button id="confirmTakeLoanButton" class="w-full py-3 px-8 rounded-full bg-blue-600 text-white text-lg font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-colors duration-200">
+                    Confirm Loan
+                </button>
+            </div>
+
+            <!-- Repay Loan Content -->
+            <div id="repayLoanContent" class="text-left hidden">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Manage Loan</h3>
+                <p class="text-lg text-gray-700 mb-4 text-center">Your current loan details:</p>
+                <ul class="text-gray-700 text-left w-full space-y-2 mb-6 px-4">
+                    <li class="flex items-center"><span class="font-semibold mr-2">Loan Amount:</span> $<span id="currentLoanAmountDisplay">0</span></li>
+                    <li class="flex items-center"><span class="font-semibold mr-2">Current Interest Rate:</span> <span id="currentLoanInterestRateDisplay">0%</span></li>
+                    <li class="flex items-center"><span class="font-semibold mr-2">Days Until Due:</span> <span id="currentLoanDaysRemaining">0</span></li>
+                </ul>
+                <button id="repayFullLoanButton" class="w-full py-3 px-8 rounded-full bg-green-600 text-white text-lg font-semibold shadow-md hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-colors duration-200">
+                    Repay Full Loan
+                </button>
+            </div>
+
+            <!-- Deposit Money Content -->
+            <div id="depositMoneyContent" class="text-left hidden">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Deposit Money to Savings</h3>
+                <p class="text-lg text-gray-700 mb-4 text-center">How much would you like to deposit?</p>
+                <input type="number" id="depositAmountInput" min="1" value="100" class="w-full p-3 mb-4 border border-gray-300 rounded-lg text-center text-lg">
+                <button id="confirmDepositButton" class="w-full py-3 px-8 rounded-full bg-indigo-600 text-white text-lg font-semibold shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-colors duration-200">
+                    Confirm Deposit
+                </button>
+            </div>
+
+            <!-- Withdraw Money Content -->
+            <div id="withdrawMoneyContent" class="text-left hidden">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Withdraw Money from Savings</h3>
+                <p class="text-lg text-gray-700 mb-4 text-center">How much would you like to withdraw?</p>
+                <input type="number" id="withdrawAmountInput" min="1" value="100" class="w-full p-3 mb-4 border border-gray-300 rounded-lg text-center text-lg">
+                <button id="confirmWithdrawButton" class="w-full py-3 px-8 rounded-full bg-purple-600 text-white text-lg font-semibold shadow-md hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 transition-colors duration-200">
+                    Confirm Withdraw
+                </button>
+            </div>
+
+            <!-- Transaction Confirmation Content (for success/failure messages) -->
+            <div id="transactionConfirmationContent" class="hidden">
+                <h3 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-4"></h3>
+                <p id="modalMessage" class="text-lg text-gray-700 mb-4"></p>
+                <button id="modalCloseButton" class="py-3 px-8 bg-indigo-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-colors duration-200">
+                    Got It!
+                </button>
+            </div>
+
+            <!-- Bankruptcy Recovery Content -->
+            <div id="bankruptcyRecoveryContent" class="text-left hidden">
+                <h3 class="text-3xl font-bold text-red-700 mb-4 text-center">BANKRUPTCY IMMINENT!</h3>
+                <p class="text-lg text-gray-700 mb-4 text-center">You're facing bankruptcy due to financial mismanagement.</p>
+                <p class="text-xl font-bold text-gray-800 mb-6 text-center">You have $<span id="recoverySavingsAmount">0</span> in savings.</p>
+                <p class="text-md text-gray-600 mb-6 text-center">Would you like to use your savings to recover and keep your companies?</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="confirmRecoveryButton" class="py-3 px-8 rounded-full bg-green-600 text-white text-lg font-semibold shadow-md hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-colors duration-200">
+                        Use Savings to Recover
+                    </button>
+                    <button id="declineRecoveryButton" class="py-3 px-8 rounded-full bg-red-600 text-white text-lg font-semibold shadow-md hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition-colors duration-200">
+                        Decline & Go Bankrupt
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initial game state
+        let userMoney = 10000; // Starting fake money
+        let savingsAccountBalance = 0; // New: Savings account balance
+        let creditScore = 700; // Initial credit score
+        let incomeIntervalId; // To store the ID of the income generation interval
+
+        // Loan specific variables
+        let currentDay = 1;
+        let loanActive = false;
+        let loanAmount = 0;
+        let loanInterestRate = 0.05; // 5%
+        let loanDueDate = 0; // The day number by which the loan is due
+        const LOAN_OFFER_AMOUNT = 5000;
+        const INITIAL_LOAN_INTEREST_RATE = 0.05; // 5%
+        const LOAN_TERM_DAYS = 5; // Loan due in 5 days
+        const OVERDUE_INTEREST_RATE_INCREASE = 0.02; // 2% increase per overdue day
+        const CREDIT_SCORE_PENALTY_OVERDUE = 50; // Points deducted per overdue day
+        const MIN_CREDIT_SCORE_FOR_LOAN = 500; // Minimum credit score to take a new loan
+
+        // Worker management variables
+        let workerSalary = 10; // Initial salary per worker per day
+        const BASE_WORKERS_PER_COMPANY = 100; // Each company starts with 100 workers
+        const MIN_ACCEPTABLE_SALARY = 8; // Below this, workers start leaving
+        const WORKER_LEAVE_RATE_PER_DAY = 0.10; // 10% of workers leave if salary is too low
+
+        const companies = [
+            { id: 'google', name: 'Google', description: 'Innovating search, AI, and cloud computing.', price: 4500, sellPrice: 4000, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 2000, image: 'https://placehold.co/600x400/4285F4/FFFFFF?font=inter&text=Google', cooldownActive: false },
+            { id: 'apple', name: 'Apple Inc.', description: 'Designing iconic electronics and software.', price: 4000, sellPrice: 3500, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 4, image: 'https://placehold.co/600x400/333333/FFFFFF?font=inter&text=Apple', cooldownActive: false },
+            { id: 'microsoft', name: 'Microsoft', description: 'Empowering productivity and cloud solutions.', price: 4200, sellPrice: 3700, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 4, image: `
+                <div class="logo-svg-container microsoft">
+                    <svg width="60%" height="60%" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="90" height="90" fill="#F25022"/>
+                        <rect x="110" y="0" width="90" height="90" fill="#7FBA00"/>
+                        <rect x="0" y="110" width="90" height="90" fill="#00A4EF"/>
+                        <rect x="110" y="110" width="90" height="90" fill="#FFB900"/>
+                    </svg>
+                </div>
+            `, isSvg: true, cooldownActive: false }, // Microsoft SVG
+            { id: 'amazon', name: 'Amazon', description: 'The world\'s largest online retailer and cloud provider.', price: 3800, sellPrice: 3300, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 1000, image: 'https://placehold.co/600x400/FF9900/000000?font=inter&text=Amazon', cooldownActive: false },
+            { id: 'tesla', name: 'Tesla', description: 'Accelerating the world\'s transition to sustainable energy.', price: 3000, sellPrice: 2500, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 3, image: 'https://placehold.co/600x400/CC0000/FFFFFF?font=inter&text=T', cooldownActive: false },
+            { id: 'netflix', name: 'Netflix', description: 'Leading the way in streaming entertainment.', price: 2800, sellPrice: 2300, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 3, image: 'https://placehold.co/600x400/E50914/FFFFFF?font=inter&text=N', cooldownActive: false },
+            { id: 'facebook', name: 'Meta Platforms', description: 'Connecting the world through social media and metaverse.', price: 3300, sellPrice: 2800, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 3, image: 'https://placehold.co/600x400/1877F2/FFFFFF?font=inter&text=%E2%88%9E', cooldownActive: false }, // Infinity symbol
+            { id: 'starbucks', name: 'Starbucks', description: 'Crafting premium coffee experiences worldwide.', price: 1200, sellPrice: 900, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 2, image: 'https://placehold.co/600x400/00704A/FFFFFF?font=inter&text=Starbucks', cooldownActive: false },
+            { id: 'disney', name: 'The Walt Disney Company', description: 'Bringing magic through entertainment and stories.', price: 3500, sellPrice: 3000, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 3, image: 'https://placehold.co/600x400/0072BC/FFFFFF?font=inter&text=Disney', cooldownActive: false },
+            { id: 'nike', name: 'Nike', description: 'Inspiring athletes with innovative sportswear.', price: 2200, sellPrice: 1900, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 2, image: `
+                <div class="logo-svg-container nike">
+                    <svg width="80%" height="80%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 50 L40 80 L90 20" stroke="white" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            `, isSvg: true, cooldownActive: false }, // Nike SVG
+            { id: 'cocacola', name: 'Coca-Cola', description: 'Refreshing the world with beloved beverages.', price: 1800, sellPrice: 1500, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 2, image: 'https://placehold.co/600x400/F40009/FFFFFF?font=inter&text=Coca-Cola', cooldownActive: false },
+            { id: 'samsung', name: 'Samsung', description: 'Global leader in electronics and technology.', price: 2500, sellPrice: 2000, owned: false, baseWorkers: BASE_WORKERS_PER_COMPANY, currentWorkers: 0, incomeRate: 2, image: 'https://placehold.co/600x400/124888/FFFFFF?font=inter&text=Samsung', cooldownActive: false }
+        ];
+
+        // Get DOM elements
+        const userMoneyDisplay = document.getElementById('userMoneyDisplay');
+        const creditScoreDisplay = document.getElementById('creditScoreDisplay');
+        const companyCardsContainer = document.getElementById('companyCardsContainer');
+        const resetGameButton = document.getElementById('resetGameButton');
+        const loanButton = document.getElementById('loanButton');
+        const nextDayButton = document.getElementById('nextDayButton');
+        const currentDayDisplay = document.getElementById('currentDayDisplay');
+        const loanStatusDisplay = document.getElementById('loanStatusDisplay');
+        const loanAmountDisplay = document.getElementById('loanAmountDisplay');
+        const loanInterestRateDisplay = document.getElementById('loanInterestRateDisplay');
+        const loanDaysRemaining = document.getElementById('loanDaysRemaining');
+
+        // Worker management elements
+        const totalWorkersDisplay = document.getElementById('totalWorkersDisplay');
+        const workerSalaryDisplay = document.getElementById('workerSalaryDisplay');
+        const increaseSalaryButton = document.getElementById('increaseSalaryButton');
+        const decreaseSalaryButton = document.getElementById('decreaseSalaryButton');
+
+        // Savings account elements
+        const savingsAccountDisplay = document.getElementById('savingsAccountDisplay');
+        const depositButton = document.getElementById('depositButton');
+        const withdrawButton = document.getElementById('withdrawButton');
+
+
+        // Modal elements for game messages and terms
+        const gameModal = document.getElementById('gameModal');
+        const termsAndAgreementContent = document.getElementById('termsAndAgreementContent');
+        const loanOfferContent = document.getElementById('loanOfferContent');
+        const repayLoanContent = document.getElementById('repayLoanContent');
+        const depositMoneyContent = document.getElementById('depositMoneyContent');
+        const withdrawMoneyContent = document.getElementById('withdrawMoneyContent');
+        const transactionConfirmationContent = document.getElementById('transactionConfirmationContent');
+        const bankruptcyRecoveryContent = document.getElementById('bankruptcyRecoveryContent');
+
+        const companyNameInTerms = document.getElementById('companyNameInTerms');
+        const modalCompanyLogo = document.getElementById('modalCompanyLogo');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const agreeCheckbox = document.getElementById('agreeCheckbox');
+        const agreeAndPurchaseButton = document.getElementById('agreeAndPurchaseButton');
+        const confirmTakeLoanButton = document.getElementById('confirmTakeLoanButton');
+        const repayFullLoanButton = document.getElementById('repayFullLoanButton');
+        const depositAmountInput = document.getElementById('depositAmountInput');
+        const confirmDepositButton = document.getElementById('confirmDepositButton');
+        const withdrawAmountInput = document.getElementById('withdrawAmountInput');
+        const confirmWithdrawButton = document.getElementById('confirmWithdrawButton');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+        const modalCloseSpan = document.querySelector('#gameModal .close-button');
+        const recoverySavingsAmount = document.getElementById('recoverySavingsAmount');
+        const confirmRecoveryButton = document.getElementById('confirmRecoveryButton');
+        const declineRecoveryButton = document.getElementById('declineRecoveryButton');
+
+
+        let companyToPurchaseId = null; // To store the ID of the company being considered for purchase
+
+        /**
+         * Calculates the total number of active workers across all owned companies.
+         * @returns {number} The total number of workers.
+         */
+        function calculateTotalActiveWorkers() {
+            return companies.filter(c => c.owned).reduce((sum, c) => sum + c.currentWorkers, 0);
+        }
+
+        /**
+         * Updates the displayed fake money amount, loan status, credit score, and worker stats.
+         */
+        function updateMoneyAndLoanDisplay() {
+            userMoneyDisplay.textContent = userMoney.toLocaleString(); // Format with commas
+            creditScoreDisplay.textContent = Math.max(0, creditScore); // Ensure score doesn't go below 0
+            savingsAccountDisplay.textContent = savingsAccountBalance.toLocaleString(); // Update savings display
+
+            // Update worker displays
+            totalWorkersDisplay.textContent = calculateTotalActiveWorkers().toLocaleString();
+            workerSalaryDisplay.textContent = workerSalary.toLocaleString();
+
+            if (loanActive) {
+                loanStatusDisplay.classList.remove('hidden');
+                loanAmountDisplay.textContent = loanAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                loanInterestRateDisplay.textContent = `${(loanInterestRate * 100).toFixed(0)}%`;
+                const daysLeft = loanDueDate - currentDay;
+                loanDaysRemaining.textContent = Math.max(0, daysLeft);
+                if (daysLeft < 0) {
+                    loanStatusDisplay.classList.remove('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
+                    loanStatusDisplay.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
+                    loanDaysRemaining.textContent = `${Math.abs(daysLeft)} overdue`;
+                } else {
+                    loanStatusDisplay.classList.remove('bg-red-100', 'border-red-300', 'text-red-800');
+                    loanStatusDisplay.classList.add('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
+                }
+                loanButton.textContent = 'Repay Loan';
+                loanButton.classList.remove('bg-blue-500', 'hover:bg-blue-600', 'focus:ring-blue-300');
+                loanButton.classList.add('bg-green-500', 'hover:bg-green-600', 'focus:ring-green-300');
+                loanButton.disabled = false; // Always allow repaying if active
+            } else {
+                loanStatusDisplay.classList.add('hidden');
+                loanButton.textContent = 'Take Loan';
+                loanButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'focus:ring-green-300');
+                loanButton.classList.add('bg-blue-500', 'hover:bg-blue-600', 'focus:ring-blue-300');
+                loanButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                loanButton.disabled = false;
+            }
+            currentDayDisplay.textContent = currentDay;
+        }
+
+        /**
+         * Displays the game modal with different content stages.
+         * @param {string} stage - 'terms', 'loan_offer', 'repay_loan', 'deposit_prompt', 'withdraw_prompt', 'confirm_success', 'confirm_fail', 'general_message', 'bankruptcy_recovery'
+         * @param {string} [companyId] - Optional: ID of the company for 'terms' stage.
+         * @param {string} [title] - Optional: Title for 'confirm' or 'general_message' stage.
+         * @param {string} [message] - Optional: Message for 'confirm' or 'general_message' stage.
+         */
+        function showGameModal(stage, companyId = null, title = '', message = '') {
+            // Hide all content sections first
+            termsAndAgreementContent.classList.add('hidden');
+            loanOfferContent.classList.add('hidden');
+            repayLoanContent.classList.add('hidden');
+            depositMoneyContent.classList.add('hidden');
+            withdrawMoneyContent.classList.add('hidden');
+            transactionConfirmationContent.classList.add('hidden');
+            bankruptcyRecoveryContent.classList.add('hidden');
+
+            if (stage === 'terms') {
+                const company = companies.find(c => c.id === companyId);
+                if (!company) {
+                    console.error('Company not found for terms:', companyId);
+                    return;
+                }
+                companyToPurchaseId = companyId; // Store the company ID for later purchase
+                companyNameInTerms.textContent = company.name; // Set company name in terms title
+
+                // Insert the company logo into the modal
+                modalCompanyLogo.innerHTML = ''; // Clear previous logo
+                if (company.isSvg) {
+                    modalCompanyLogo.innerHTML = company.image; // Directly insert SVG string
+                    // Add specific class for SVG background if needed
+                    if (company.id === 'nike') {
+                        modalCompanyLogo.classList.add('nike-modal');
+                        modalCompanyLogo.classList.remove('microsoft-modal');
+                    } else if (company.id === 'microsoft') {
+                        modalCompanyLogo.classList.add('microsoft-modal');
+                        modalCompanyLogo.classList.remove('nike-modal');
+                    } else {
+                        modalCompanyLogo.classList.remove('nike-modal', 'microsoft-modal');
+                    }
+                } else {
+                    // For placeholder images, create an img tag
+                    const img = document.createElement('img');
+                    img.src = company.image;
+                    img.alt = `${company.name} Logo`;
+                    img.className = 'w-full h-full object-contain'; // Tailwind for image styling
+                    modalCompanyLogo.appendChild(img);
+                    modalCompanyLogo.classList.remove('nike-modal', 'microsoft-modal'); // Remove specific SVG backgrounds
+                }
+
+                termsAndAgreementContent.classList.remove('hidden');
+                agreeCheckbox.checked = false; // Reset checkbox
+                agreeAndPurchaseButton.disabled = true; // Disable button
+                agreeAndPurchaseButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else if (stage === 'loan_offer') {
+                if (loanActive) {
+                    showGameModal('general_message', null, 'Loan Active!', 'You already have an active loan. Please repay it before taking another.');
+                    return;
+                }
+                if (creditScore < MIN_CREDIT_SCORE_FOR_LOAN) {
+                    // Show a general message about loan denial instead of the loan offer content
+                    showGameModal('general_message', null, 'Loan Denied!', 'Sorry, the bank doesn\'t trust you to take out a loan. You haven\'t repaid them on time!');
+                    return; // Exit here to prevent showing the loan offer content
+                }
+                // If eligible, show the loan offer content
+                loanOfferContent.classList.remove('hidden');
+                document.getElementById('offerLoanAmount').textContent = LOAN_OFFER_AMOUNT.toLocaleString();
+                document.getElementById('offerInterestRate').textContent = `${(INITIAL_LOAN_INTEREST_RATE * 100).toFixed(0)}%`;
+                document.getElementById('offerLoanTerm').textContent = LOAN_TERM_DAYS;
+                confirmTakeLoanButton.disabled = false; // Ensure button is enabled if offer is shown
+                confirmTakeLoanButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else if (stage === 'repay_loan') {
+                if (!loanActive) {
+                    showGameModal('general_message', null, 'No Loan', 'You do not have an active loan to repay.');
+                    return;
+                }
+                repayLoanContent.classList.remove('hidden');
+                document.getElementById('currentLoanAmountDisplay').textContent = loanAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                document.getElementById('currentLoanInterestRateDisplay').textContent = `${(loanInterestRate * 100).toFixed(0)}%`;
+                const daysLeft = loanDueDate - currentDay;
+                document.getElementById('currentLoanDaysRemaining').textContent = Math.max(0, daysLeft);
+                if (daysLeft < 0) {
+                    document.getElementById('currentLoanDaysRemaining').textContent = `${Math.abs(daysLeft)} days overdue`;
+                    document.getElementById('currentLoanDaysRemaining').classList.add('text-red-600');
+                } else {
+                    document.getElementById('currentLoanDaysRemaining').classList.remove('text-red-600');
+                }
+            } else if (stage === 'deposit_prompt') {
+                depositMoneyContent.classList.remove('hidden');
+                depositAmountInput.value = Math.min(100, userMoney); // Pre-fill with a reasonable amount or current money
+                depositAmountInput.max = userMoney; // Set max to current money
+            } else if (stage === 'withdraw_prompt') {
+                withdrawMoneyContent.classList.remove('hidden');
+                withdrawAmountInput.value = Math.min(100, savingsAccountBalance); // Pre-fill with a reasonable amount or current savings
+                withdrawAmountInput.max = savingsAccountBalance; // Set max to current savings
+            } else if (stage === 'confirm_success') {
+                transactionConfirmationContent.classList.remove('hidden');
+                modalTitle.textContent = 'Success!';
+                modalMessage.textContent = message;
+            } else if (stage === 'confirm_fail') {
+                transactionConfirmationContent.classList.remove('hidden');
+                modalTitle.textContent = 'Action Failed!';
+                modalMessage.textContent = message;
+            } else if (stage === 'general_message') {
+                transactionConfirmationContent.classList.remove('hidden');
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+            } else if (stage === 'bankruptcy_recovery') {
+                bankruptcyRecoveryContent.classList.remove('hidden');
+                recoverySavingsAmount.textContent = savingsAccountBalance.toLocaleString();
+            }
+            gameModal.style.display = 'flex';
+        }
+
+        /**
+         * Hides the game modal.
+         */
+        function hideGameModal() {
+            gameModal.style.display = 'none';
+            companyToPurchaseId = null; // Clear the stored company ID
+        }
+
+        /**
+         * Renders all company cards based on their current state (owned/not owned, cooldown).
+         */
+        function renderCompanyCards() {
+            companyCardsContainer.innerHTML = ''; // Clear existing cards
+            companies.forEach(company => {
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-3xl shadow-xl overflow-hidden p-6 flex flex-col items-center transform transition-all duration-300 ${company.owned ? 'opacity-70 border-4 border-green-400' : 'hover:scale-105'}`;
+
+                // Determine button state and text
+                let buttonText;
+                let buttonClasses;
+                let isDisabled = false;
+                let buttonAction; // 'buy' or 'sell'
+
+                if (company.owned) {
+                    buttonText = 'Sell Company';
+                    buttonClasses = 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transform transition-transform duration-200 active:scale-95';
+                    buttonAction = 'sell';
+                } else {
+                    buttonText = 'Buy Now';
+                    buttonClasses = 'bg-gradient-to-r from-indigo-600 to-purple-700 text-white hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 transform transition-transform duration-200 active:scale-95';
+                    buttonAction = 'buy';
+                }
+
+                // If on cooldown, disable and change style
+                if (company.cooldownActive) {
+                    buttonText = 'Cooldown...';
+                    buttonClasses = 'bg-yellow-500 cursor-not-allowed'; // Yellow for cooldown
+                    isDisabled = true;
+                }
+
+
+                // Determine image or SVG content for the card
+                let cardImageContent;
+                if (company.isSvg) {
+                    cardImageContent = company.image; // Directly insert SVG string
+                } else {
+                    cardImageContent = `<img src="${company.image}" alt="${company.name} Logo" class="w-full h-full object-cover">`;
+                }
+
+                card.innerHTML = `
+                    <!-- Company Image/SVG Container -->
+                    <div class="w-full h-40 mb-4 rounded-2xl overflow-hidden shadow-md">
+                        ${cardImageContent}
+                    </div>
+                    <!-- Company Details -->
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">
+                        ${company.name}
+                    </h2>
+                    <p class="text-sm text-gray-600 mb-4 text-center leading-relaxed flex-grow">
+                        ${company.description}
+                    </p>
+                    <!-- Price / Owned Status -->
+                    <div class="flex items-center justify-center mb-6">
+                        ${company.owned ?
+                            `<span class="text-2xl font-extrabold text-green-600">OWNED!</span><span class="text-lg text-gray-500 ml-2">(Sell: $${company.sellPrice.toLocaleString()})</span>` :
+                            `<span class="text-4xl font-extrabold text-indigo-700 mr-2">$${company.price.toLocaleString()}</span>`
+                        }
+                    </div>
+                    <!-- Action Button -->
+                    <button data-company-id="${company.id}" data-action="${buttonAction}"
+                        class="action-button w-full py-3 px-6 rounded-full text-lg font-semibold shadow-md ${buttonClasses}"
+                        ${isDisabled ? 'disabled' : ''}>
+                        ${buttonText}
+                    </button>
+                `;
+                companyCardsContainer.appendChild(card);
+            });
+
+            // Add event listeners to all action buttons
+            document.querySelectorAll('.action-button').forEach(button => {
+                button.addEventListener('click', handleActionButtonClick);
+            });
+        }
+
+        /**
+         * Handles the click event for either a "Buy Now" or "Sell Company" button.
+         * @param {Event} event - The click event object.
+         */
+        function handleActionButtonClick(event) {
+            const companyId = event.target.dataset.companyId;
+            const action = event.target.dataset.action;
+            const company = companies.find(c => c.id === companyId);
+
+            if (!company) {
+                console.error('Company not found:', companyId);
+                return;
+            }
+
+            if (action === 'buy') {
+                if (company.owned) {
+                    showGameModal('general_message', null, 'Oops!', `${company.name} is already in your portfolio!`);
+                    return;
+                }
+                if (company.cooldownActive) {
+                    showGameModal('general_message', null, 'Hold On!', `Please wait a moment before trying to buy ${company.name} again.`);
+                    return;
+                }
+                // If all checks pass, show the terms of service modal
+                showGameModal('terms', companyId);
+
+            } else if (action === 'sell') {
+                if (!company.owned) {
+                    showGameModal('general_message', null, 'Error!', `You don't own ${company.name} to sell it!`);
+                    return;
+                }
+
+                userMoney += company.sellPrice;
+                company.owned = false;
+                company.currentWorkers = 0; // Set workers to 0 when sold
+                company.cooldownActive = false; // Reset cooldown when sold
+                updateMoneyAndLoanDisplay(); // Update display after selling
+                renderCompanyCards(); // Re-render to update button state and owned status
+                showGameModal('general_message', null, 'Sold!', `You've successfully sold ${company.name} for $${company.sellPrice.toLocaleString()}.`);
+            }
+        }
+
+        /**
+         * Handles the purchase logic after terms are agreed.
+         */
+        function handleAgreeAndPurchase() {
+            const company = companies.find(c => c.id === companyToPurchaseId);
+
+            if (!company) {
+                console.error('Company not found for purchase after terms agreement:', companyToPurchaseId);
+                hideGameModal();
+                return;
+            }
+
+            // Re-check conditions just in case (though they should be met)
+            if (userMoney >= company.price) {
+                userMoney -= company.price;
+                company.owned = true;
+                company.currentWorkers = company.baseWorkers; // Set workers when bought
+                company.cooldownActive = true; // Activate cooldown for buying
+                updateMoneyAndLoanDisplay(); // Update display after buying
+                renderCompanyCards(); // Re-render to update button state and owned status
+                showGameModal('confirm_success', null, '', `Congratulations! You've successfully bought ${company.name} for $${company.price.toLocaleString()}.`);
+
+                // Set a timeout to remove cooldown after COOLDOWN_DURATION
+                setTimeout(() => {
+                    company.cooldownActive = false;
+                    renderCompanyCards(); // Re-render to re-enable the button
+                }, COOLDOWN_DURATION);
+
+            } else {
+                showGameModal('confirm_fail', null, '', `You need $${(company.price - userMoney).toLocaleString()} more to buy ${company.name}. Keep saving!`);
+            }
+            companyToPurchaseId = null; // Clear the stored ID after attempt
+        }
+
+        /**
+         * Handles taking a loan.
+         */
+        function takeLoan() {
+            if (loanActive) {
+                showGameModal('general_message', null, 'Loan Active!', 'You already have an active loan. Please repay it before taking another.');
+                return;
+            }
+            // Credit score check is now handled by showGameModal('loan_offer')
+            // This function is only called if the loan offer is actually displayed and confirmed.
+
+            loanActive = true;
+            loanAmount = LOAN_OFFER_AMOUNT;
+            loanInterestRate = INITIAL_LOAN_INTEREST_RATE;
+            loanDueDate = currentDay + LOAN_TERM_DAYS;
+            userMoney += loanAmount;
+            updateMoneyAndLoanDisplay();
+            showGameModal('confirm_success', null, 'Loan Taken!', `You've taken a loan of $${LOAN_OFFER_AMOUNT.toLocaleString()}! Remember to pay it back by day ${loanDueDate}.`);
+        }
+
+        /**
+         * Handles repaying the loan.
+         */
+        function repayLoan() {
+            if (!loanActive) {
+                showGameModal('general_message', null, 'No Loan', 'You do not have an active loan to repay.');
+                return;
+            }
+
+            const totalRepayment = Math.ceil(loanAmount); // Round up to nearest whole dollar for simplicity
+
+            if (userMoney >= totalRepayment) {
+                userMoney -= totalRepayment;
+                loanActive = false;
+                loanAmount = 0;
+                loanInterestRate = INITIAL_LOAN_INTEREST_RATE; // Reset interest rate
+                loanDueDate = 0;
+                updateMoneyAndLoanDisplay();
+                showGameModal('confirm_success', null, 'Loan Repaid!', `You've successfully repaid your loan of $${totalRepayment.toLocaleString()}.`);
+            } else {
+                showGameModal('confirm_fail', null, 'Cannot Repay Loan!', `You need $${(totalRepayment - userMoney).toLocaleString()} more to repay your loan.`);
+            }
+        }
+
+        /**
+         * Handles depositing money into the savings account.
+         */
+        function depositMoney() {
+            const amount = parseInt(depositAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                showGameModal('general_message', null, 'Invalid Amount', 'Please enter a valid positive number for deposit.');
+                return;
+            }
+            if (userMoney < amount) {
+                showGameModal('general_message', null, 'Insufficient Funds', 'You do not have enough money to deposit that amount.');
+                return;
+            }
+            userMoney -= amount;
+            savingsAccountBalance += amount;
+            updateMoneyAndLoanDisplay();
+            showGameModal('confirm_success', null, 'Deposit Successful!', `You deposited $${amount.toLocaleString()} into your savings account.`);
+        }
+
+        /**
+         * Handles withdrawing money from the savings account.
+         */
+        function withdrawMoney() {
+            const amount = parseInt(withdrawAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                showGameModal('general_message', null, 'Invalid Amount', 'Please enter a valid positive number for withdrawal.');
+                return;
+            }
+            if (savingsAccountBalance < amount) {
+                showGameModal('general_message', null, 'Insufficient Savings', 'You do not have enough money in your savings account to withdraw that amount.');
+                return;
+            }
+            savingsAccountBalance -= amount;
+            userMoney += amount;
+            updateMoneyAndLoanDisplay();
+            showGameModal('confirm_success', null, 'Withdrawal Successful!', `You withdrew $${amount.toLocaleString()} from your savings account.`);
+        }
+
+        /**
+         * Adjusts the worker salary.
+         * @param {number} amount - The amount to change the salary by.
+         */
+        function adjustWorkerSalary(amount) {
+            workerSalary = Math.max(1, workerSalary + amount); // Ensure salary doesn't go below 1
+            updateMoneyAndLoanDisplay();
+            showGameModal('general_message', null, 'Salary Adjusted!', `Worker salary is now $${workerSalary} per day.`);
+        }
+
+        /**
+         * Handles the bankruptcy recovery process using savings.
+         */
+        function recoverFromBankruptcy() {
+            if (savingsAccountBalance > 0) {
+                userMoney = savingsAccountBalance; // Transfer savings to main money
+                savingsAccountBalance = 0; // Clear savings
+                loanActive = false; // Clear loan
+                loanAmount = 0;
+                loanInterestRate = INITIAL_LOAN_INTEREST_RATE;
+                loanDueDate = 0;
+                // Credit score remains low to reflect the near-bankruptcy event
+                companies.forEach(company => {
+                    if (!company.owned) { // Only restore workers if company was not owned before bankruptcy
+                        company.currentWorkers = company.baseWorkers;
+                    }
+                    // Companies already owned stay owned, workers are restored if they were lost
+                    if (company.owned && company.currentWorkers === 0) {
+                        company.currentWorkers = company.baseWorkers;
+                    }
+                    company.cooldownActive = false; // Reset cooldowns
+                });
+                updateMoneyAndLoanDisplay();
+                renderCompanyCards(); // Re-render to show restored workers/companies
+                showGameModal('general_message', null, 'Recovery Successful!', `You used your savings to recover from bankruptcy! Your companies are safe, but your credit score is still low. Manage your finances carefully!`);
+            } else {
+                showGameModal('general_message', null, 'No Savings!', 'You have no savings to recover from bankruptcy. Game over!');
+                resetGame(); // Force a full reset if no savings to recover
+            }
+        }
+
+        /**
+         * Triggers the full bankruptcy state.
+         */
+        function triggerFullBankruptcy(dailyMessage) {
+            userMoney = 0; // Set money to 0
+            loanActive = false;
+            loanAmount = 0;
+            loanInterestRate = INITIAL_LOAN_INTEREST_RATE;
+            loanDueDate = 0;
+            creditScore = 0; // Ensure credit score is 0 on bankruptcy
+            companies.forEach(company => {
+                company.owned = false; // Lose all companies
+                company.currentWorkers = company.baseWorkers; // Reset workers for next game
+                company.cooldownActive = false; // Reset cooldowns
+            });
+            updateMoneyAndLoanDisplay();
+            renderCompanyCards();
+            showGameModal('general_message', null, 'BANKRUPTCY!', dailyMessage + '<br><br>You violated the terms of service by failing to manage your finances and/or workforce, leading to bankruptcy. All your companies have been repossessed!');
+        }
+
+        /**
+         * Advances the game to the next day and applies loan interest and credit score penalties.
+         */
+        function handleNextDay() {
+            currentDay++;
+            let dailyMessage = `Day ${currentDay} begins!`;
+            let bankruptcyImminent = false; // Flag to check if bankruptcy conditions are met
+
+            // 1. Handle Loan Interest and Credit Score
+            if (loanActive) {
+                const interest = loanAmount * loanInterestRate;
+                loanAmount += interest;
+                dailyMessage += ` Your loan increased by $${interest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} due to interest.`;
+
+                if (currentDay > loanDueDate) {
+                    loanInterestRate = Math.min(1.0, loanInterestRate + OVERDUE_INTEREST_RATE_INCREASE); // Cap interest at 100%
+                    creditScore = Math.max(0, creditScore - CREDIT_SCORE_PENALTY_OVERDUE); // Credit score goes down
+                    dailyMessage += ` Your loan is overdue! Interest rate increased to ${(loanInterestRate * 100).toFixed(0)}% and your credit score dropped by ${CREDIT_SCORE_PENALTY_OVERDUE} points.`;
+
+                    if (creditScore === 0) {
+                        bankruptcyImminent = true;
+                        dailyMessage += ' Your credit score hit 0!';
+                    }
+                }
+            }
+
+            // 2. Handle Worker Costs and Exodus
+            const totalActiveWorkers = calculateTotalActiveWorkers();
+            if (totalActiveWorkers > 0) {
+                const dailyWorkerCost = totalActiveWorkers * workerSalary;
+                userMoney -= dailyWorkerCost;
+                dailyMessage += ` Paid $${dailyWorkerCost.toLocaleString()} in worker salaries.`;
+
+                if (workerSalary < MIN_ACCEPTABLE_SALARY) {
+                    let workersLostToday = 0;
+                    companies.forEach(company => {
+                        if (company.owned && company.currentWorkers > 0) {
+                            const leaving = Math.ceil(company.currentWorkers * WORKER_LEAVE_RATE_PER_DAY);
+                            company.currentWorkers = Math.max(0, company.currentWorkers - leaving);
+                            workersLostToday += leaving;
+                        }
+                    });
+                    if (workersLostToday > 0) {
+                        dailyMessage += ` Due to low pay, ${workersLostToday} workers left your companies!`;
+                    }
+
+                    // Check if all workers have left for owned companies
+                    const remainingActiveWorkers = calculateTotalActiveWorkers();
+                    if (companies.some(c => c.owned) && remainingActiveWorkers === 0) {
+                        bankruptcyImminent = true;
+                        dailyMessage += ' All your workers have left!';
+                    }
+                }
+            } else if (companies.some(c => c.owned)) {
+                // If you own companies but have 0 workers, this is also a bankruptcy trigger
+                bankruptcyImminent = true;
+                dailyMessage += ' You have no workers left to run your companies!';
+            }
+
+
+            // 3. Check for Bankruptcy and offer recovery
+            if (bankruptcyImminent) {
+                if (savingsAccountBalance > 0) {
+                    showGameModal('bankruptcy_recovery'); // Offer recovery option
+                    // Do not update money/loan/companies yet, wait for user decision
+                    return; // Stop further daily processing, wait for user input
+                } else {
+                    triggerFullBankruptcy(dailyMessage); // No savings, proceed to full bankruptcy
+                    return; // Stop further daily processing
+                }
+            }
+
+            updateMoneyAndLoanDisplay();
+            showGameModal('general_message', null, 'New Day!', dailyMessage);
+        }
+
+        /**
+         * Generates passive income from owned companies.
+         */
+        function generateIncome() {
+            let totalIncome = 0;
+            companies.forEach(company => {
+                if (company.owned) {
+                    totalIncome += company.incomeRate; // Use individual incomeRate
+                }
+            });
+            if (totalIncome > 0) {
+                userMoney += totalIncome;
+                updateMoneyAndLoanDisplay();
+            }
+        }
+
+        /**
+         * Resets the game to its initial state.
+         */
+        function resetGame() {
+            userMoney = 10000;
+            savingsAccountBalance = 0; // Reset savings
+            creditScore = 700; // Reset credit score
+            currentDay = 1;
+            loanActive = false;
+            loanAmount = 0;
+            loanInterestRate = INITIAL_LOAN_INTEREST_RATE;
+            loanDueDate = 0;
+            workerSalary = 10; // Reset worker salary
+
+            companies.forEach(company => {
+                company.owned = false;
+                company.currentWorkers = company.baseWorkers; // Reset workers for next game
+                company.cooldownActive = false; // Reset cooldown state
+            });
+            updateMoneyAndLoanDisplay();
+            renderCompanyCards();
+            showGameModal('general_message', null, 'Game Reset!', 'Your fake money and company ownership have been reset. Start buying and managing again!');
+
+            // Restart income generation after reset
+            clearInterval(incomeIntervalId); // Clear any existing interval
+            incomeIntervalId = setInterval(generateIncome, 1000); // Start new interval
+        }
+
+        // Event Listeners for Modal
+        modalCloseSpan.addEventListener('click', hideGameModal);
+        modalCloseButton.addEventListener('click', hideGameModal);
+        window.addEventListener('click', (event) => {
+            if (event.target === gameModal) {
+                hideGameModal();
+            }
+        });
+
+        // Event listener for the "Agree to Terms" checkbox
+        agreeCheckbox.addEventListener('change', () => {
+            if (agreeCheckbox.checked) {
+                agreeAndPurchaseButton.disabled = false;
+                agreeAndPurchaseButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                agreeAndPurchaseButton.disabled = true;
+                agreeAndPurchaseButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Event listener for the "Agree & Purchase" button
+        agreeAndPurchaseButton.addEventListener('click', handleAgreeAndPurchase);
+
+        // Event listener for "Confirm Loan" button in loan offer modal
+        confirmTakeLoanButton.addEventListener('click', takeLoan);
+
+        // Event listener for "Repay Full Loan" button in repay loan modal
+        repayFullLoanButton.addEventListener('click', repayLoan);
+
+        // Event Listener for Loan Button (dynamic text)
+        loanButton.addEventListener('click', () => {
+            if (loanActive) {
+                showGameModal('repay_loan');
+            } else {
+                showGameModal('loan_offer'); // This will now handle the credit score check and show a message if denied
+            }
+        });
+
+        // Event Listeners for Worker Salary Buttons
+        increaseSalaryButton.addEventListener('click', () => adjustWorkerSalary(1));
+        decreaseSalaryButton.addEventListener('click', () => adjustWorkerSalary(-1));
+
+        // New Event Listeners for Savings Account
+        depositButton.addEventListener('click', () => showGameModal('deposit_prompt'));
+        confirmDepositButton.addEventListener('click', depositMoney);
+        withdrawButton.addEventListener('click', () => showGameModal('withdraw_prompt'));
+        confirmWithdrawButton.addEventListener('click', withdrawMoney);
+
+        // New Event Listeners for Bankruptcy Recovery
+        confirmRecoveryButton.addEventListener('click', recoverFromBankruptcy);
+        declineRecoveryButton.addEventListener('click', () => {
+            hideGameModal(); // Hide the recovery modal
+            triggerFullBankruptcy('You chose not to use your savings or had none available.'); // Proceed with full bankruptcy
+        });
+
+
+        // Event Listener for Next Day Button
+        nextDayButton.addEventListener('click', handleNextDay);
+
+        // Event Listener for Reset Button
+        resetGameButton.addEventListener('click', resetGame);
+
+        // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMoneyAndLoanDisplay();
+            renderCompanyCards();
+            incomeIntervalId = setInterval(generateIncome, 1000); // Start income generation on load
+        });
+    </script>
+</body>
+</html>

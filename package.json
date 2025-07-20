@@ -1,0 +1,11 @@
+{
+  "name": "themoneygame",
+  "version": "1.0.0",
+  "description": "A company tycoon simulation game",
+  "scripts": {
+    "dev": "npx serve"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
